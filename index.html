@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>Sepsis / Septik Şok KDS</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--navy:#0f172a;--blue:#1d4ed8;--red:#b42318;--amber:#b54708;--green:#067647;--bg:#f3f6fb;--line:#d9e2ec;--ink:#102033;--muted:#667085}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+header{background:var(--navy);color:white;padding:18px}.wrap{max-width:1000px;margin:auto;padding:14px}
+.card{background:white;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(15,23,42,.04)}
+h1,h2,h3{margin-top:0}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:760px){.grid,.grid2{grid-template-columns:1fr}}
+label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:5px}
+input,select,button{width:100%;padding:10px;border-radius:10px;border:1px solid #cfd8e3;font-size:15px;background:#fff}
+button{font-weight:700;cursor:pointer}.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.secondary{background:#eef2f7}
+.greenbtn{background:var(--green);color:white;border-color:var(--green)}.hidden{display:none!important}
+.status{padding:10px 12px;border-radius:10px;margin-top:10px;font-weight:700;line-height:1.45}.blue{background:#eff8ff;color:#175cd3}.amber{background:#fffaeb;color:var(--amber)}.red{background:#fef3f2;color:var(--red)}.ok{background:#ecfdf3;color:var(--green)}
+.small{font-size:12px;color:var(--muted);line-height:1.45}.badge{display:inline-block;padding:3px 7px;border-radius:999px;font-size:11px;font-weight:800;background:#eff8ff;color:#175cd3;border:1px solid #b2ddff}.badge-delphi{background:#f4f3ff;color:#5925dc;border-color:#d9d6fe}.badge-op{background:#f2f4f7;color:#344054;border-color:#d0d5dd}.evidence{padding:10px;border-radius:10px;background:#fafafa;border:1px solid var(--line);font-size:12px;line-height:1.5;margin:8px 0}.split3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}@media(max-width:760px){.split3{grid-template-columns:1fr}}
+.now{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}@media(max-width:760px){.now{grid-template-columns:1fr}}
+.nowitem{border-left:5px solid var(--red);background:#fff;border-radius:10px;padding:10px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.bundle{display:grid;grid-template-columns:42px 1fr 120px;gap:10px;align-items:center}.num{width:36px;height:36px;border-radius:50%;background:#e8eef7;display:flex;align-items:center;justify-content:center;font-weight:800}
+.hero{border:2px solid #b2ddff;background:linear-gradient(180deg,#fff,#f8fbff)}.module-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.disclaimer{font-size:12px;line-height:1.45;margin-top:10px;padding:10px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}.scorebox{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;margin-top:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid var(--line)}.scorebig{font-size:42px;font-weight:900;line-height:1;text-align:center}.scorelabel{text-align:center;font-size:12px;color:var(--muted);margin-top:5px}.scorebreak{font-size:12px;line-height:1.55;color:var(--muted)}@media(max-width:600px){.scorebox{grid-template-columns:1fr}.scorebig{font-size:36px}}
+</style>
+</head>
+<body>
+<header>
+<h1>Sepsis / Septik Şok Klinik Karar Destek Sistemi</h1>
+<div>SSC 2026 + Sepsis Code Delphi 2026 ile güncellenmiş prototip</div>
+<div class="disclaimer"><b>Sorumluluk Reddi Beyanı:</b> Klinik karar desteği ve standardizasyon içindir; hekim değerlendirmesinin, kurum protokolünün veya güncel ilaç bilgisinin yerini almaz.</div>
+</header>
+
+<div class="wrap">
+<div class="card"><b>Kanıt hiyerarşisi:</b> <span class="badge">SSC26</span> birincil kılavuz; <span class="badge badge-delphi">Delphi26</span> tartışmalı alanlarda tamamlayıcı uzman konsensüsü. Çelişki varsa KDS varsayılanı SSC26 olarak kalır.</div>
+
+<div class="card">
+<h2>Epizod / ortak hasta verileri</h2>
+<div class="grid">
+<div><label>Epizod / yatak etiketi</label><input id="episode"></div>
+<div><label>Yaş</label><input id="age" type="number"></div>
+<div><label>Cinsiyet</label><select id="sex"><option value="">Seçiniz</option><option value="male">Erkek</option><option value="female">Kadın</option></select></div>
+<div><label>Boy (cm)</label><input id="height" type="number"></div>
+<div><label>Kilo (kg)</label><input id="weight" type="number"></div>
+<div><label>Kreatinin (mg/dL)</label><input id="scr" type="number" step="0.1"></div>
+<div><label>Enfeksiyon odağı</label><select id="source"><option value="">Seçiniz</option><option>Odağı belli olmayan sepsis</option><option>Pnömoni</option><option>Ürosepsis</option><option>Batın içi sepsis</option><option>Deri / yumuşak doku sepsisi</option><option>Hastanede gelişen sepsis</option></select></div>
+</div>
+</div>
+
+<div class="card hero">
+<h2>1. AKUT RESÜSİTASYON</h2>
+<p><b>Sepsise bağlı hipotansiyon ve/veya periferik perfüzyon bozukluğu var mı?</b></p>
+<div class="grid">
+<div><label>SBP</label><input id="sbp" type="number"></div><div><label>DBP</label><input id="dbp" type="number"></div>
+<div><label>MAP</label><input id="map" readonly></div><div><label>CRT (sn)</label><input id="crt" type="number" step="0.1"></div>
+<div><label>Mottling</label><select id="mottling"><option value="">Seçiniz</option><option value="no">Yok</option><option value="yes">Var</option></select></div>
+<div><label>Laktat</label><input id="lactate" type="number" step="0.1"></div><div><label>Saatlik idrar (mL/sa)</label><input id="urine" type="number"></div>
+<div><label>İdrar mL/kg/sa</label><input id="uo" readonly></div><div><label>Mental durum</label><select id="mental"><option value="">Seçiniz</option><option value="normal">Normal</option><option value="altered">Yeni bozulma</option></select></div>
+<div><label>Periferik ısı</label><select id="temp"><option value="">Seçiniz</option><option value="warm">Sıcak</option><option value="cool">Soğuk</option></select></div>
+</div>
+<div id="gateSupport" class="status blue">Veriler girildikçe destekleyici bulgular gösterilir.</div>
+<div class="grid2" style="margin-top:10px"><button id="gateNo" class="secondary">Hayır</button><button id="gateYes" class="primary">Evet — resüsitasyonu başlat</button></div>
+</div>
+
+<div id="resusDetail" class="hidden">
+<div class="card">
+<h3>Başlangıç kristalloid resüsitasyonu</h3>
+<div class="grid"><div><label>BMI</label><input id="bmi" readonly></div><div><label>Hesaplama kilosu</label><input id="cw" readonly></div><div><label>30 mL/kg SSC26 referans hacmi (mL)</label><input id="target" readonly></div><div><label>Verilen (mL)</label><input id="given" type="number"></div></div>
+<div id="fluidNote" class="status blue">Boy, kilo ve cinsiyet girildiğinde hesaplanır.</div><div class="evidence"><span class="badge">SSC26</span> İlk 3 saatte ≥30 mL/kg kristalloid önerisi koşullu/düşük kesinliktedir ve sık yeniden değerlendirme gerektirir. <span class="badge badge-delphi">Delphi26</span> Sabit hacim yerine fizyolojiye göre bireyselleştirilmiş, dinamik sıvı stratejisini destekler. Bu nedenle 30 mL/kg burada <b>referans hacim</b> olarak gösterilir; bolusların sürdürülmesi CRT/SVI-CI yanıtı ve sıvı toleransına bağlıdır.</div>
+<h3 style="margin-top:16px">Başlangıç sonrası hemodinamik yolak</h3>
+<div class="grid2"><button id="noAdv" class="secondary">İleri monitörizasyon YOK → CRT/AS2</button><button id="yesAdv" class="primary">İleri monitörizasyon VAR → SVI/CI</button></div>
+</div>
+
+<div id="as2" class="card hidden"><h3>CRT / AS2 tabanlı yolak</h3><div class="grid"><div><label>CRT önce</label><input id="crtB" type="number" step="0.1"></div><div><label>CRT sonra</label><input id="crtA" type="number" step="0.1"></div><div><label>Küçük bolus (mL)</label><input id="bolus" type="number"></div></div><div id="crtResp" class="status blue">CRT önce/sonra girin.</div></div>
+
+<div id="adv" class="card hidden"><h3>İleri hemodinamik yolak</h3><div class="grid"><div><label>Test</label><select id="test"><option value="">Seçiniz</option><option>PLR</option><option>Sıvı challenge</option></select></div><div><label>SVI/CI önce</label><input id="svB" type="number" step="0.1"></div><div><label>SVI/CI sonra</label><input id="svA" type="number" step="0.1"></div></div><div id="svResp" class="status blue">Dinamik değişim hesaplanır.</div></div>
+<div class="card"><h3>Vazopressör ve hemodinamik monitörizasyon</h3>
+<div class="grid"><div><label>Norepinefrin (µg/kg/dk)</label><input id="neDose" type="number" step="0.01"></div><div><label>Vazopressin</label><select id="vaso"><option value="">Seçiniz</option><option value="no">Yok</option><option value="yes">Başlandı</option></select></div><div><label>Şok başlangıcından ≥3 saat?</label><select id="shock3h"><option value="">Seçiniz</option><option value="no">Hayır</option><option value="yes">Evet</option></select></div><div><label>Şok devam ediyor?</label><select id="shockPersists"><option value="">Seçiniz</option><option value="no">Hayır</option><option value="yes">Evet</option></select></div><div><label>ScvO₂ / SvO₂ (%)</label><input id="scvo2" type="number" step="1"></div><div><label>v-a CO₂ farkı (mmHg)</label><input id="vaco2" type="number" step="0.1"></div><div><label>Ekokardiyografi</label><select id="echo"><option value="">Seçiniz</option><option value="notdone">Yapılmadı</option><option value="normal">Ventriküler fonksiyon korunmuş</option><option value="dysfunction">Ventriküler disfonksiyon</option></select></div><div><label>Persistan hipoperfüzyon</label><select id="persistentHypo"><option value="">Seçiniz</option><option value="no">Hayır</option><option value="yes">Evet</option></select></div></div>
+<div id="pressorMsg" class="status blue">Norepinefrin birinci basamak vazopressördür; sıvı ile eşzamanlı erken başlanabilir.</div>
+<div class="evidence"><span class="badge badge-delphi">Delphi26</span> CRT ilk 3 saatte değerlendirilmeli; şok 3 saat sonra sürüyorsa hemodinamik monitörizasyon yoğunlaştırılmalı. ScvO₂/SvO₂, v-a CO₂ farkı ve invaziv hat varsa kardiyak debi türevleri yardımcıdır; ekokardiyografi başlangıç değerlendirmesinde yararlı fakat tek başına sürekli monitörün yerini tutmaz.</div></div>
+</div>
+
+<div class="card">
+<h2>2. ŞİMDİ — geciktirilmemesi gereken işlemler</h2>
+<div class="now">
+<div class="nowitem"><b>Kan kültürleri</b><select id="cultures" style="margin-top:8px"><option value="">Seçiniz</option><option value="pending">Henüz alınmadı</option><option value="taken">Alındı</option></select><div id="cultureMsg" class="small" style="margin-top:6px"></div></div>
+<div class="nowitem"><b>Antimikrobiyal tedavi</b><select id="abxStarted" style="margin-top:8px"><option value="">Seçiniz</option><option value="no">Başlanmadı</option><option value="yes">Başlandı</option></select><div id="abxMsg" class="small" style="margin-top:6px"></div></div>
+<div class="nowitem"><b>Kaynak kontrolü</b><select id="sourceControl" style="margin-top:8px"><option value="">Seçiniz</option><option value="notneeded">Gerekmiyor</option><option value="needed">Gerekli / bekliyor</option><option value="done">Tamamlandı</option></select><div id="sourceMsg" class="small" style="margin-top:6px"></div></div>
+</div>
+<div class="status blue">⚠️ Kan kültürlerini mümkünse antimikrobiyal tedaviden önce alın; kültür alınması acil antimikrobiyal tedaviyi geciktirmemelidir.</div>
+</div>
+
+<div class="card">
+<h2>3. SEPSİS YÖNETİM DEMETLERİ</h2>
+<div class="bundle"><div class="num">1</div><div><b>Tanı & Mikrobiyoloji</b> <span class="badge badge-delphi">Delphi26</span><div class="small">Erken tanı, biyobelirteçler, kültürler ve hızlı moleküler tanı</div></div><button id="toggleMicro" class="secondary">Aç</button></div>
+<div id="microDetail" class="module-detail hidden"><h3>Tanı & Mikrobiyoloji</h3>
+<div class="grid"><div><label>Prokalsitonin</label><input id="pct" type="number" step="0.01"></div><div><label>CRP</label><input id="crp" type="number" step="0.1"></div><div><label>MDW</label><input id="mdw" type="number" step="0.1"></div><div><label>β-D-glukan</label><select id="bdg"><option value="">Seçiniz</option><option value="notdone">Bakılmadı</option><option value="neg">Negatif</option><option value="pos">Pozitif</option></select></div><div><label>Hızlı moleküler tanı</label><select id="rapidDx"><option value="">Seçiniz</option><option value="unavailable">Mevcut değil</option><option value="pending">Gönderildi / bekleniyor</option><option value="available">Sonuç mevcut</option></select></div></div>
+<div id="microMsg" class="status blue">Konvansiyonel kültürler temel tanısal yöntem olarak korunur.</div>
+<div class="evidence"><span class="badge badge-delphi">Delphi26</span>  erken tanı aracı olarak öne çıktı; moleküler testler ve multiplex platformlar desteklendi ancak klasik mikrobiyolojinin yerini almamalı. PCT/MDW tanısal desteğe eklenebilir. <b>Çelişki:</b> Delphi26 PCT'yi antibiyotik başlatma kararını destekleyici bulurken, <span class="badge">SSC26</span> antibiyotik başlatma kararında klinik değerlendirmeyi PCT+klinik değerlendirmeye tercih eder. Bu KDS'de PCT tek başına antibiyotik başlatma/durdurma tetikleyicisi değildir.</div></div>
+<hr>
+<div class="bundle"><div class="num">2</div><div><b>Antimikrobiyal Tedavi</b> <span class="badge">SSC26</span><div class="small">Gerçek Antibiyotik KDS: ampirik seçim + risk faktörleri + renal doz + CRRT + TDM uyarıları</div></div><button id="openAbx" class="greenbtn">Antibiyotik KDS</button></div>
+<div id="betaHint" class="status blue"><span class="badge">SSC26</span> Beta-laktam: yükleme dozu → uygun ajanlarda uzatılmış/sürekli infüzyon idamesi. <span class="badge badge-delphi">Delphi26</span> PK/PD optimizasyonu, zaman-bağımlı antibiyotiklerde prolonged infusion, MDR riski varsa uygun kapsama, mikrobiyoloji çıkar çıkmaz uyarlama, mümkünse kısa tedavi ve de-eskalasyonu destekler. Septik şokta hızlı tanı yoksa kombinasyon tedavisi düşünülebilir; evrensel kombinasyon önerilmez.</div>
+<hr>
+<div class="bundle"><div class="num">3</div><div><b>Kaynak Kontrolü</b><div class="small">Gereklilik, plan, tamamlanma</div></div><button id="toggleSource" class="secondary">Aç</button></div><div id="sourceDetail" class="module-detail hidden"><h3>Kaynak Kontrolü</h3><div class="grid2"><div><label>Sepsis / kaynak tanı zamanı</label><input id="scDxTime" type="datetime-local"></div><div><label>Kaynak kontrolü gerekli mi?</label><select id="scNeed"><option value="">Seçiniz</option><option value="no">Hayır</option><option value="yes">Evet</option></select></div><div><label>Planlanan işlem</label><select id="scPlan"><option value="">Seçiniz</option><option>Drenaj</option><option>Debridman</option><option>Cerrahi girişim</option><option>Enfekte kateter/cihaz çıkarılması</option><option>Diğer</option></select></div><div><label>Durum</label><select id="scStatus"><option value="">Seçiniz</option><option value="pending">Bekliyor</option><option value="planned">Planlandı</option><option value="done">Tamamlandı</option></select></div><div><label>Tamamlanma zamanı</label><input id="scTime" type="datetime-local"></div></div><div id="scMsg" class="status blue">Kaynak kontrolü gerekliliğini değerlendir.</div><div class="evidence"><span class="badge">SSC26</span> <span class="badge badge-delphi">Delphi26</span> Kaynak kontrolü mümkün olduğunca erken, operasyonel olarak <b>6 saat içinde</b> hedeflenir; hemodinamik instabilite gerekli drenaj/cerrahiyi geciktirmek için tek başına gerekçe değildir.</div></div>
+<hr>
+<div class="bundle"><div class="num">4</div><div><b>Solunum</b><div class="small">Oksijenasyon, HFNO, ARDS, ventilasyon</div></div><button id="toggleResp" class="secondary">Aç</button></div><div id="respDetail" class="module-detail hidden"><h3>Solunum</h3><div class="grid"><div><label>SpO₂ (%)</label><input id="spo2" type="number"></div><div><label>FiO₂ (0.21–1.00 veya %21–100)</label><input id="fio2" type="number" step="0.01" placeholder="0.40 veya 40"></div><div><label>Solunum sayısı (/dk)</label><input id="rr" type="number"></div><div><label>PaO₂ (mmHg)</label><input id="pao2" type="number"></div><div><label>P/F</label><input id="pf" readonly></div><div><label>S/F</label><input id="sf" readonly></div><div><label>ROX (otomatik = [SpO₂/FiO₂]/SS)</label><input id="rox" readonly></div><div><label>Destek</label><select id="respSupport"><option value="">Seçiniz</option><option>Oda havası</option><option>Konvansiyonel O₂</option><option>HFNO</option><option>NIV</option><option>İnvaziv MV</option></select></div></div><div class="grid2" style="margin-top:10px"><div><label>ARDS?</label><select id="ards"><option value="">Seçiniz</option><option value="no">Hayır</option><option value="yes">Evet</option></select></div><div><label>SpO₂ hedefi</label><input value="94–97%" readonly></div></div><div id="respMsg" class="status blue">Oksijenasyon verilerini girin.</div></div>
+<hr>
+<div class="bundle"><div class="num">5</div><div><b>Renal & Metabolik</b><div class="small">AKI, idrar, elektrolitler, asit-baz</div></div><button id="toggleRenal" class="secondary">Aç</button></div><div id="renalDetail" class="module-detail hidden"><h3>Renal & Metabolik</h3><div class="grid"><div><label>Mevcut kreatinin</label><input id="renalScr" type="number" step="0.1"></div><div><label>Bazal kreatinin</label><input id="baseScr" type="number" step="0.1"></div><div><label>Saatlik idrar</label><input id="renalUrine" readonly></div><div><label>İdrar mL/kg/sa</label><input id="renalUo" readonly></div><div><label>K</label><input id="potassium" type="number" step="0.1"></div><div><label>Na</label><input id="sodium" type="number"></div><div><label>Cl</label><input id="chloride" type="number"></div><div><label>HCO₃</label><input id="hco3" type="number" step="0.1"></div><div><label>pH</label><input id="ph" type="number" step="0.01"></div><div><label>PaCO₂</label><input id="paco2" type="number"></div><div><label>Anyon açıklığı</label><input id="ag" readonly></div><div><label>Winter beklenen PaCO₂</label><input id="winter" readonly></div></div><div id="renalMsg" class="status blue">Renal ve metabolik verileri girin.</div></div>
+<hr>
+<div class="bundle"><div class="num">6</div><div><b>Destek Tedavileri</b><div class="small">Beslenme, glukoz, VTE, stres ülseri, transfüzyon</div></div><button id="toggleSupport" class="secondary">Aç</button></div><div id="supportDetail" class="module-detail hidden"><h3>Destek Tedavileri</h3><div class="grid2"><div><label>Glukoz</label><input id="glucose" type="number"></div><div><label>Hemoglobin</label><input id="hb" type="number" step="0.1"></div><div><label>VTE profilaksisi</label><select id="vte"><option value="">Seçiniz</option><option value="pharm">Farmakolojik uygun</option><option value="contra">Farmakolojik kontrendike</option><option value="none">Değerlendirilmedi</option></select></div><div><label>Gİ kanama riski</label><select id="giRisk"><option value="">Seçiniz</option><option value="no">Düşük</option><option value="yes">Yüksek</option></select></div><div><label>Enteral beslenme</label><select id="nutrition"><option value="">Seçiniz</option><option value="started">Başlandı</option><option value="planned">Planlandı</option><option value="contra">Kontrendike/ertelendi</option></select></div><div><label>Konjesyon / sıvı yükü</label><select id="congestion"><option value="">Seçiniz</option><option value="no">Yok</option><option value="yes">Var</option></select></div><div><label>Şok/resüsitasyon >72 saat</label><select id="after72"><option value="">Seçiniz</option><option value="no">Hayır</option><option value="yes">Evet</option></select></div><div><label>Persistan O₂ sunum/perfüzyon sorunu</label><select id="o2Delivery"><option value="">Seçiniz</option><option value="no">Hayır</option><option value="yes">Evet</option></select></div></div><div id="supportMsg" class="status blue">Destek tedavilerini değerlendir.</div><div class="evidence"><span class="badge badge-delphi">Delphi26</span> 72 saat sonrasında daha restriktif sıvı yaklaşımı desteklenir. Transfüzyon kararı yalnız Hb eşik değerine indirgenmemeli; persistan oksijen sunumu/perfüzyon sorunu varsa bireyselleştirilmelidir. <span class="badge">SSC26</span> genel olarak restriktif transfüzyon stratejisini korur.</div></div>
+</div>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const val=id=>{const e=$(id); if(!e)return null; const n=parseFloat(e.value); return Number.isFinite(n)?n:null};
+
+
+function update(){
+  const sbp=val("sbp"), dbp=val("dbp");
+  $("map").value=(sbp!==null&&dbp!==null)?((sbp+2*dbp)/3).toFixed(1):"";
+  const w=val("weight"), u=val("urine");
+  $("uo").value=(w&&u!==null)?(u/w).toFixed(2):"";
+
+  const signs=[], map=val("map"), crt=val("crt"), lac=val("lactate"), uo=val("uo");
+  if((map!==null&&map<65)||(sbp!==null&&sbp<90))signs.push("hipotansiyon");
+  if(crt!==null&&crt>3)signs.push("CRT >3 sn");
+  if($("mottling").value==="yes")signs.push("mottling");
+  if(lac!==null&&lac>2)signs.push("laktat yüksekliği");
+  if(uo!==null&&uo<0.5)signs.push("oligüri");
+  if($("mental").value==="altered")signs.push("mental durum bozukluğu");
+  if($("temp").value==="cool")signs.push("soğuk perifer");
+  $("gateSupport").className="status "+(signs.length?"amber":"blue");
+  $("gateSupport").textContent=signs.length?"Perfüzyon bozukluğunu destekleyen bulgular: "+signs.join(" • "):"Belirgin destekleyici bulgu girilmedi; nihai karar hekimindir.";
+
+  const h=val("height"), sex=$("sex").value, given=val("given")||0;
+  if(h&&w&&sex){
+    const bmi=w/((h/100)**2), inches=h/2.54;
+    const ibw=Math.max((sex==="male"?50:45.5)+2.3*(inches-60),1);
+    const adj=ibw+0.4*(w-ibw), cw=bmi>30?adj:w, t=Math.round(cw*30);
+    $("bmi").value=bmi.toFixed(1); $("cw").value=cw.toFixed(1); $("target").value=t;
+    $("fluidNote").textContent=(bmi>30?"BMI >30: operasyonel AdjBW kullanıldı. ":"Gerçek kilo kullanıldı. ")+`SSC26 referans ${t} mL • Verilen ${Math.round(given)} mL • Referansa kalan ${Math.max(0,t-given)} mL`;
+  }
+
+  const cb=val("crtB"), ca=val("crtA");
+  if(cb!==null&&ca!==null){
+    const box=$("crtResp"), d=cb-ca;
+    if(ca<=3){box.className="status ok"; box.textContent=`CRT ${cb} → ${ca} sn. Perfüzyon normalize → ek bolusu durdur ve yeniden değerlendir.`}
+    else if(d>=0.5){box.className="status ok"; box.textContent=`CRT ${cb} → ${ca} sn. Perfüzyon yanıtı mevcut → sıvı toleransı uygunsa küçük kristalloid bolusuna devam et, her bolus sonrası CRT'yi yeniden ölç.`}
+    else{box.className="status red"; box.textContent=`CRT ${cb} → ${ca} sn. Belirgin yanıt yok → ek bolusa devam etme; vazopressör/POCUS/şok fenotipini değerlendir.`}
+  }
+
+  const sb=val("svB"), sa=val("svA");
+  if(sb!==null&&sa!==null&&sb!==0){
+    const p=(sa-sb)/sb*100, box=$("svResp");
+    if(p>=10){box.className="status ok"; box.textContent=`ΔSVI/CI +${p.toFixed(1)}%. Sıvı yanıtlılığı lehine → tolerans uygunsa küçük bolusa devam et ve yeniden değerlendir.`}
+    else{box.className="status red"; box.textContent=`ΔSVI/CI ${p.toFixed(1)}%. Sıvı yanıtlılığı gösterilemedi → ek sıvı verme; fenotiplemeye geç.`}
+  }
+
+  $("cultureMsg").textContent=$("cultures").value==="pending"?"Örnekle; antibiyotiği geciktirme.":$("cultures").value==="taken"?"Alındı.":"";
+  $("abxMsg").textContent=$("abxStarted").value==="no"?"Antimikrobiyal tedaviyi geciktirme.":$("abxStarted").value==="yes"?"Başlandı.":"";
+  $("sourceMsg").textContent=$("sourceControl").value==="needed"?"Kaynak kontrolü bekliyor.":$("sourceControl").value==="done"?"Tamamlandı.":$("sourceControl").value==="notneeded"?"Gerekmiyor.":"";
+
+  if($("renalUrine")) $("renalUrine").value=$("urine").value;
+  if($("renalUo")) $("renalUo").value=$("uo").value;
+  if($("renalScr") && document.activeElement!==$("renalScr") && $("scr").value) $("renalScr").value=$("scr").value;
+
+  const spo2=val("spo2"), fio2Raw=val("fio2"), rr=val("rr"), pao2=val("pao2");
+  const fio2=(fio2Raw!==null && fio2Raw>1)?fio2Raw/100:fio2Raw;
+  const fio2Valid=(fio2!==null && fio2>=0.21 && fio2<=1.0);
+  if($("pf")) $("pf").value=(pao2!==null&&fio2Valid)?(pao2/fio2).toFixed(0):"";
+  if($("sf")) $("sf").value=(spo2!==null&&fio2Valid)?(spo2/fio2).toFixed(0):"";
+  if($("rox")) $("rox").value=(spo2!==null&&fio2Valid&&rr!==null&&rr>0)?((spo2/fio2)/rr).toFixed(2):"";
+  if($("respMsg")){const m=[];if(fio2Raw!==null&&!fio2Valid)m.push("FiO₂ 0.21–1.00 veya %21–100 biçiminde girilmeli");if(spo2!==null&&spo2<94)m.push("SpO₂ hedefin altında");if(spo2!==null&&spo2>97)m.push("gereksiz hiperoksiden kaçın");const rox=val("rox");if($("respSupport").value==="HFNO"&&rox!==null&&rox<3.85)m.push("ROX düşük — HFNO başarısızlığı açısından yakın değerlendirme");$("respMsg").className="status "+(m.length?"amber":"blue");$("respMsg").textContent=m.length?m.join(" • "):"SpO₂ hedefi 94–97%; klinik bağlamla değerlendir.";}
+
+  const na=val("sodium"),cl=val("chloride"),hc=val("hco3"),k=val("potassium"),ph=val("ph"),rs=val("renalScr"),bs=val("baseScr");
+  if($("ag")) $("ag").value=(na!==null&&cl!==null&&hc!==null)?(na-cl-hc).toFixed(1):"";
+  if($("winter")) $("winter").value=(hc!==null)?`${(1.5*hc+6).toFixed(0)}–${(1.5*hc+10).toFixed(0)} mmHg`:"";
+  if($("renalMsg")){const r=[];if(k!==null&&k>=6.5)r.push("🔴 Ağır hiperkalemi — acil değerlendirme");if(ph!==null&&ph<=7.2)r.push("ağır asidemi");if(rs!==null&&bs!==null&&bs>0){const q=rs/bs;if(q>=3)r.push("KDIGO kreatinin kriteri ile Evre 3 olası");else if(q>=2)r.push("KDIGO kreatinin kriteri ile Evre 2 olası");else if(q>=1.5||rs-bs>=0.3)r.push("KDIGO kreatinin kriteri ile Evre 1 olası");}$("renalMsg").className="status "+(r.some(x=>x.includes("🔴"))?"red":r.length?"amber":"blue");$("renalMsg").textContent=r.length?r.join(" • "):"AKI ve metabolik bozukluk açısından seri değerlendirme.";}
+
+  if($("scMsg")){const need=$("scNeed").value,st=$("scStatus").value;if(need==="yes"&&st!=="done"){$("scMsg").className="status red";$("scMsg").textContent="Kaynak kontrolü gerekli ve henüz tamamlanmamış — gecikmeden planla/uygula."}else if(need==="yes"&&st==="done"){$("scMsg").className="status ok";$("scMsg").textContent="Kaynak kontrolü tamamlandı."}else if(need==="no"){$("scMsg").className="status blue";$("scMsg").textContent="Kaynak kontrolü gerekmiyor; klinik değişiklikte yeniden değerlendir."}}
+
+  if($("supportMsg")){const g=val("glucose"),hb=val("hb"),vte=$("vte").value,gi=$("giRisk").value;const s=[];if(g!==null&&g>=180)s.push("glukoz ≥180 mg/dL — insülini değerlendir");if(hb!==null&&hb<7)s.push("Hb <7 g/dL — transfüzyon kararını klinik bağlamla değerlendir");if(vte==="contra")s.push("farmakolojik VTE profilaksisi kontrendike — SCD uygunluğunu değerlendir");if(gi==="yes")s.push("Gİ kanama riski yüksek — stres ülseri profilaksisini değerlendir");if($("after72")?.value==="yes"&&$("congestion")?.value==="yes")s.push("72 saat sonrası + konjesyon: daha restriktif sıvı/de-resüsitasyon yaklaşımını değerlendir");if($("o2Delivery")?.value==="yes"&&hb!==null&&hb>=7)s.push("Delphi26: persistan O₂ sunum/perfüzyon sorunu varsa Hb ≥7 olsa da transfüzyon bireyselleştirilebilir");$("supportMsg").className="status "+(s.length?"amber":"blue");$("supportMsg").textContent=s.length?s.join(" • "):"Destek tedavilerini hasta özelinde değerlendir.";}
+
+  if($("pressorMsg")){
+    const ne=val("neDose"),vaso=$("vaso").value,h3=$("shock3h").value,persists=$("shockPersists").value,echo=$("echo").value,hypo=$("persistentHypo").value;
+    const a=[];
+    if(ne!==null&&ne>0)a.push("Norepinefrin birinci basamak vazopressör");
+    if(ne!==null&&ne>=0.25&&ne<=0.5&&vaso!=="yes")a.push("Delphi26: NE 0.25–0.5 µg/kg/dk aralığında vazopressin eklenmesini değerlendir");
+    if(ne!==null&&ne>0.5&&vaso!=="yes")a.push("Vazopressin eklenmemiş — vazopressör eskalasyonunu yeniden değerlendir");
+    if(h3==="yes"&&persists==="yes")a.push("Delphi26: 3 saat sonunda şok sürüyor → hemodinamik monitörizasyonu yoğunlaştır");
+    if(echo==="dysfunction"&&hypo==="yes")a.push("Ventriküler disfonksiyon + persistan hipoperfüzyon → dobutamin/inotropi değerlendir");
+    if(echo==="normal")a.push("Ventriküler fonksiyon korunmuşsa dobutamin rutin kullanma");
+    $("pressorMsg").className="status "+(a.length?"amber":"blue");$("pressorMsg").textContent=a.length?a.join(" • "):"Norepinefrin birinci basamak vazopressördür; sıvı ile eşzamanlı erken başlanabilir.";
+  }
+
+  if($("microMsg")){
+    const rapid=$("rapidDx").value,bdg=$("bdg").value,m=[];
+    if(rapid==="available")m.push("Hızlı moleküler sonuç: antimikrobiyal tedaviyi mikrobiyoloji/duyarlılığa göre hızla uyarlayın");
+    if(rapid==="unavailable"&&!$("resusDetail").classList.contains("hidden"))m.push("Septik şok + hızlı tanı yok: Delphi26 kombinasyon tedavisini destekler; evrensel kombinasyon önerilmez");
+    if(bdg==="pos")m.push("β-D-glukan pozitifliği tek başına antifungal başlatma kararı değildir; fungal risk ve klinik bağlamla yorumlayın");
+    $("microMsg").className="status "+(m.length?"amber":"blue");$("microMsg").textContent=m.length?m.join(" • "):"Konvansiyonel kültürler temel tanısal yöntem olarak korunur.";
+  }
+
+  if($("scMsg")){
+    const dx=$("scDxTime")?.value,done=$("scTime")?.value,need=$("scNeed").value,st=$("scStatus").value;
+    let hrs=null;if(dx){const a=new Date(dx);const b=(st==="done"&&done)?new Date(done):new Date();hrs=(b-a)/36e5;}
+    if(need==="yes"&&st!=="done"){$("scMsg").className="status red";$("scMsg").textContent="Kaynak kontrolü gerekli ve tamamlanmamış"+(hrs!==null?` • geçen süre ${hrs.toFixed(1)} saat`:"")+(hrs!==null&&hrs>=6?" • 6 saat hedefi aşıldı":" • mümkün olduğunca erken uygula");}
+    else if(need==="yes"&&st==="done"){$("scMsg").className="status ok";$("scMsg").textContent="Kaynak kontrolü tamamlandı"+(hrs!==null?` • tanıdan ${hrs.toFixed(1)} saat sonra`:"");}
+  }
+}
+
+
+document.querySelectorAll("input,select").forEach(e=>{e.addEventListener("input",update);e.addEventListener("change",update)});
+["spo2","fio2","rr","pao2","respSupport"].forEach(id=>{
+  const e=$(id);
+  if(e){ e.addEventListener("keyup",update); e.addEventListener("blur",update); }
+});
+$("gateYes").addEventListener("click",()=>$("resusDetail").classList.remove("hidden"));
+$("gateNo").addEventListener("click",()=>$("resusDetail").classList.add("hidden"));
+$("noAdv").addEventListener("click",()=>{$("as2").classList.remove("hidden");$("adv").classList.add("hidden")});
+$("yesAdv").addEventListener("click",()=>{$("adv").classList.remove("hidden");$("as2").classList.add("hidden")});
+function toggleModule(buttonId,panelId){$(buttonId).addEventListener("click",()=>{const p=$(panelId);const opening=p.classList.contains("hidden");p.classList.toggle("hidden");$(buttonId).textContent=opening?"Kapat":"Aç";if(opening)p.scrollIntoView({behavior:"smooth",block:"nearest"});});}
+toggleModule("toggleMicro","microDetail");
+toggleModule("toggleSource","sourceDetail");toggleModule("toggleResp","respDetail");toggleModule("toggleRenal","renalDetail");toggleModule("toggleSupport","supportDetail");
+
+$("openAbx").addEventListener("click",()=>{
+  const q=new URLSearchParams();
+  const source=$("source").value; if(source)q.set("focus",source);
+  if(!$("resusDetail").classList.contains("hidden"))q.set("shock","1");
+  ["age","sex","height","weight","scr"].forEach(id=>{if($(id).value)q.set(id,$(id).value)});
+  location.href="antibiyotik_kds.html?"+q.toString();
+});
+update();
+setInterval(update,30000);
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>

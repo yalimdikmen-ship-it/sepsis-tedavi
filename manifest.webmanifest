@@ -1,0 +1,9 @@
+{
+  "name": "Sepsis / Septik Şok KDS",
+  "short_name": "Sepsis KDS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f3f6fb",
+  "theme_color": "#0f172a",
+  "icons": []
+}
