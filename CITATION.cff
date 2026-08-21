@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "Bu yazılımı bilimsel veya akademik çalışmalarda kullanıyorsanız lütfen atıf yapınız."
+title: "Sepsis ve Septik Şok Klinik Karar Destek Sistemi"
+type: software
+authors:
+  - family-names: "Dikmen"
+    given-names: "Yalım"
+version: "1.0"
+date-released: "2026-08-21"
+license: GPL-3.0
